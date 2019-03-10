@@ -5,56 +5,107 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WebScraper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="WebScraper" Height="450" MinHeight="150" Width="600" MinWidth="600" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Row="1" Grid.Column="1">
             <DockPanel>
-                <Menu Background="Transparent" Width="50">
-                    <MenuItem Header="File">
-                        <MenuItem Header="Export"
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+
+                    <Menu Grid.Column="0" Background="WhiteSmoke" Width="50" BorderBrush="Gray" BorderThickness="1" Margin="0,0,10,10">
+                        <MenuItem Header="File" HorizontalAlignment="Stretch">
+                            <MenuItem Header="Export"
                                   x:Name="EntriesExport"
-                                  Click="EntriesExport_OnClick"/>
-                        <MenuItem Header="Import"
+                                  Click="EntriesExport_OnClick"
+                                  />
+                            <MenuItem Header="Import"
                                   x:Name="EntriesImport"
                                   Click="EntriesImport_OnClick"/>
-                    </MenuItem>
-                    <MenuItem Header="Clear"
+                        </MenuItem>
+                        <MenuItem Header="Clear"
                               x:Name="EntriesClear"
                               Click="EntriesClear_OnClick"/>
-                </Menu>
-                    <Button x:Name="BtnScraper"
+                    </Menu>
+
+
+                    <DockPanel Grid.Column="1">
+                        <Button x:Name="BtnScraper"
+                            Content="Scrape"
+                            IsDefault="True"
+                            HorizontalAlignment="Right"
                             DockPanel.Dock="Right"
                             Width="50"
-                            Height="25"
-                            Content="Scrape"
-                            Margin="0,10,0,0"
+                            Height="30"
+                            Margin="10,10,10,10"
                             Click="BtnScraper_OnClick"/>
 
-                    <TextBox DockPanel.Dock="Bottom"
-                             x:Name="TbPage"
-                             Height="20"
+                        <TextBox x:Name="TbPage"
+                             DockPanel.Dock="Left"
                              Text="Webpage"
-                             Margin="0,10,0,0"
+                             Height="30"
+                             MinWidth="200"
+                             Margin="0,10,0,10"
                              GotFocus="TbPage_OnGotFocus"
                              LostFocus="TbPage_OnLostFocus"
+                             Foreground="Silver"/>
+                    </DockPanel>
+
+
+                    
+                    <DockPanel Grid.Column="1" Grid.Row="2">
+                        <Button x:Name="BtnPgAmt"
+                                Content="Set"
+                                DockPanel.Dock="Right"
+                                HorizontalAlignment="Right"
+                                Width="50"
+                                Height="30"
+                                Margin="10,0,10,10"
+                                Click="BtnPgAmt_OnClick"/>
+                        <TextBox Width="40" Height="30" Margin="0,0,0,10"
+                             x:Name="pgAmt"
+                             Text="Pages"
+                             GotFocus="pgAmt_OnGotFocus"
+                             LostFocus="pgAmt_OnLostFocus"
                              Foreground="Silver"
-                             />
+                             DockPanel.Dock="Right"
+                             HorizontalAlignment="Right"/>
+
+                    </DockPanel>
+                </Grid>
             </DockPanel>
         </Grid>
 
-        <Grid Grid.Row="1">
-            <DataGrid x:Name="GridEntries" ItemsSource="{Binding Entries}"  ColumnWidth="*" AlternatingRowBackground="Silver" AutoGenerateColumns="False">
+        <Grid Grid.Row="2" Grid.Column="1">
+            <DataGrid x:Name="GridEntries" ItemsSource="{Binding Entries, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  ColumnWidth="*" 
+                      AlternatingRowBackground="Silver" AutoGenerateColumns="False" 
+                      CanUserAddRows="False" CanUserDeleteRows="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="20" MinWidth="20"/>
-                    <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*" MinWidth="40"/>
-                    <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="80" MinWidth="40"/>
-                    <DataGridTextColumn Header="Link" Binding="{Binding Link}" Width="*" MinWidth="40"/>
-
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="Auto" MinWidth="20"/>
+                    <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="Auto" MinWidth="40"/>
+                    <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="Auto" MinWidth="40"/>
+                    <DataGridTextColumn Header="Link" Binding="{Binding Link}" Width="Auto" MinWidth="60"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

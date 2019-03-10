@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,11 +28,16 @@ namespace WebScraper
             InitializeComponent();
             _scraper = new Scraper();
             DataContext = _scraper;
+
+            SizeToContent = SizeToContent.Width;
         }
 
         private void BtnScraper_OnClick(object sender, RoutedEventArgs e)
         {
-            _scraper.ScrapeData(TbPage.Text);
+            string url = TbPage.Text;
+            //Thread t = new Thread(() => _scraper.ScrapeData(url));
+            //t.Start();
+            ThreadPool.QueueUserWorkItem(o => _scraper.ScrapeData(url));
         }
 
         private void EntriesExport_OnClick(object sender, RoutedEventArgs e)
@@ -73,6 +79,33 @@ namespace WebScraper
         {
             _scraper.Entries.Clear();
             
+        }
+
+        private void pgAmt_OnGotFocus(object sender, RoutedEventArgs e)
+        {
+            if (pgAmt.Foreground == Brushes.Silver)
+            {
+                pgAmt.Text = "";
+                pgAmt.Foreground = Brushes.Black;
+            }
+        }
+
+        private void pgAmt_OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            if (pgAmt.Text == "")
+            {
+                pgAmt.Text = "Pages";
+                pgAmt.Foreground = Brushes.Silver;
+            }
+        }
+
+        private void BtnPgAmt_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _scraper.PageAmount = Int32.Parse(pgAmt.Text);
+            }
+            catch { }
         }
     }
 }
