@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 using System.Web;
 using CsvHelper;
 using HtmlAgilityPack;
+using Microsoft.Win32;
 
 namespace WebScraper
 {
@@ -74,8 +76,10 @@ namespace WebScraper
 
                             Id = _entries.Count + 1;
                         }
-
+                        // DEBUG
+                        loop = false;
                         pageNumber++;
+                        System.Threading.Thread.Sleep(1000); // Delay between HTTP requests.
                     }
                 }
             }
@@ -88,14 +92,40 @@ namespace WebScraper
 
         public void Export()
         {
-            using (TextWriter tw = File.CreateText("SampleData.csv"))
+            if (Entries.Count != 0)
             {
-                using (var cw = new CsvWriter(tw))
+                using (TextWriter tw = File.CreateText("SampleData.csv"))
                 {
-                    foreach (var entry in Entries)
+                    using (var cw = new CsvWriter(tw))
                     {
-                        cw.WriteRecord(entry);
+                        cw.WriteHeader<EntryModel>();
                         cw.NextRecord();
+                        foreach (var entry in Entries)
+                        {
+                            //cw.WriteHeader<EntryModel>();
+                            cw.WriteRecord(entry);
+                            cw.NextRecord();
+                        }
+                    }
+                }
+            }
+        }
+
+        public void Import(string file)
+        {
+            if (File.Exists(file))
+            {
+                using (TextReader tr = File.OpenText(file))
+                {
+                    using (var cw = new CsvReader(tr))
+                    {
+                        var records = cw.GetRecords<EntryModel>();
+                        Entries.Clear();
+                        //EntryModel entry = new EntryModel();
+                        foreach (var entry in records)
+                        {
+                            Entries.Add(entry);
+                        }
                     }
                 }
             }
