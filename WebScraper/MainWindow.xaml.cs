@@ -22,6 +22,9 @@ namespace WebScraper
     /// </summary>
     public partial class MainWindow : Window
     {
+
+
+
         private Scraper _scraper;
         public MainWindow()
         {
@@ -29,7 +32,7 @@ namespace WebScraper
             _scraper = new Scraper();
             DataContext = _scraper;
 
-            SizeToContent = SizeToContent.Width;
+            
         }
 
         private void BtnScraper_OnClick(object sender, RoutedEventArgs e)
@@ -37,6 +40,7 @@ namespace WebScraper
             string url = TbPage.Text;
             //Thread t = new Thread(() => _scraper.ScrapeData(url));
             //t.Start();
+            //t.IsBackground = true;
             ThreadPool.QueueUserWorkItem(o => _scraper.ScrapeData(url));
         }
 
@@ -106,6 +110,11 @@ namespace WebScraper
                 _scraper.PageAmount = Int32.Parse(pgAmt.Text);
             }
             catch { }
+        }
+
+        private void BtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }
