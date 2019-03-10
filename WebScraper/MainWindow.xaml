@@ -14,7 +14,7 @@
 
         <Grid Grid.Row="0">
             <DockPanel>
-                <Menu>
+                <Menu Background="Transparent" Width="50">
                     <MenuItem Header="File">
                         <MenuItem Header="Export"
                                   x:Name="EntriesExport"
@@ -23,6 +23,9 @@
                                   x:Name="EntriesImport"
                                   Click="EntriesImport_OnClick"/>
                     </MenuItem>
+                    <MenuItem Header="Clear"
+                              x:Name="EntriesClear"
+                              Click="EntriesClear_OnClick"/>
                 </Menu>
                     <Button x:Name="BtnScraper"
                             DockPanel.Dock="Right"
@@ -45,7 +48,14 @@
         </Grid>
 
         <Grid Grid.Row="1">
-            <DataGrid x:Name="GridEntries" ItemsSource="{Binding Entries}" ColumnWidth="*" AlternatingRowBackground="Silver">
+            <DataGrid x:Name="GridEntries" ItemsSource="{Binding Entries}"  ColumnWidth="*" AlternatingRowBackground="Silver" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="20" MinWidth="20"/>
+                    <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="*" MinWidth="40"/>
+                    <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="80" MinWidth="40"/>
+                    <DataGridTextColumn Header="Link" Binding="{Binding Link}" Width="*" MinWidth="40"/>
+
+                </DataGrid.Columns>
             </DataGrid>
         </Grid>
     </Grid>

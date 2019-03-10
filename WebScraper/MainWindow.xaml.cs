@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace WebScraper
 {
@@ -40,7 +41,14 @@ namespace WebScraper
 
         private void EntriesImport_OnClick(object sender, RoutedEventArgs e)
         {
-            
+            OpenFileDialog fDialog = new OpenFileDialog();
+            fDialog.Filter = "Csv files (*.csv)|*.csv";
+            fDialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            if (fDialog.ShowDialog() == true)
+            {
+                var file = fDialog.FileName;
+                _scraper.Import(file);
+            }
         }
 
         private void TbPage_OnGotFocus(object sender, RoutedEventArgs e)
@@ -59,6 +67,12 @@ namespace WebScraper
                 TbPage.Text = "Webpage";
                 TbPage.Foreground = Brushes.Silver;
             }
+        }
+
+        private void EntriesClear_OnClick(object sender, RoutedEventArgs e)
+        {
+            _scraper.Entries.Clear();
+            
         }
     }
 }
