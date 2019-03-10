@@ -7,6 +7,7 @@ using System.IO.Packaging;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
@@ -21,6 +22,13 @@ namespace WebScraper
         private ObservableCollection<EntryModel> _entries = new ObservableCollection<EntryModel>();
         private int _id = new int();
         private int _pageAmount;
+        //private volatile bool _isRunning;
+
+        //public bool IsRunning
+        //{
+        //    get { return _isRunning; }
+        //    set { _isRunning = value; }
+        //}
 
         public int PageAmount
         {
@@ -29,11 +37,6 @@ namespace WebScraper
         }
 
 
-        public int Id
-        {
-            get { return _id; }
-            set { _id = value; }
-        }
 
         public ObservableCollection<EntryModel> Entries
         {
@@ -45,8 +48,9 @@ namespace WebScraper
         {
             try
             {
+                
                 int pageNumber = 1;
-                Id = _entries.Count + 1;
+                _id = _entries.Count + 1;
                 var web = new HtmlWeb();
                 //_pageAmount = 0;
 
@@ -55,7 +59,12 @@ namespace WebScraper
                     pageNumber = Int32.Parse(Regex.Match(page, @"(?=.+)\d+").ToString());
                 }
                 var startPageNumber = pageNumber;
-                var finalPageNumber = startPageNumber + _pageAmount - 1;
+
+                var finalPageNumber = 1;
+                if (_pageAmount != 0)
+                {
+                    finalPageNumber = startPageNumber + _pageAmount - 1;
+                }
 
                 bool loop = true;
                 while (loop)
@@ -83,18 +92,13 @@ namespace WebScraper
                             var metaDate = HttpUtility.HtmlDecode(article.SelectSingleNode("div[@class = 'meta']").InnerText);
                             var iStart = metaDate.IndexOf("Posted ") + 7;
                             var date = metaDate.Substring(iStart, metaDate.IndexOf(" in") - iStart);
-
-                            //Debug.Print($"Id: {Id}\n" +
-                            //            $"Title: {header}\n" +
-                            //            $"Date: {date}\n" +
-                            //            $"Link: {link}");
                             
                             Application.Current.Dispatcher.Invoke(() =>
                             {
-                            _entries.Add(new EntryModel { Id = Id, Title = header, Date = date, Link = link });
+                            _entries.Add(new EntryModel { Id = _id, Title = header, Date = date, Link = link });
                             });
 
-                            Id = _entries.Count + 1;
+                            _id = _entries.Count + 1;
                         }
                         pageNumber++;
                         // DEBUG
@@ -117,7 +121,6 @@ namespace WebScraper
                         cw.NextRecord();
                         foreach (var entry in _entries)
                         {
-                            //cw.WriteHeader<EntryModel>();
                             cw.WriteRecord(entry);
                             cw.NextRecord();
                         }
@@ -134,9 +137,9 @@ namespace WebScraper
                 {
                     using (var cw = new CsvReader(tr))
                     {
-                        var records = cw.GetRecords<EntryModel>();
                         _entries.Clear();
-                        //EntryModel entry = new EntryModel();
+
+                        var records = cw.GetRecords<EntryModel>();
                         foreach (var entry in records)
                         {
                             _entries.Add(entry);
