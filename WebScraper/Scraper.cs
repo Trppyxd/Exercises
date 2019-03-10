@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using System.Windows;
 using CsvHelper;
 using HtmlAgilityPack;
 using Microsoft.Win32;
@@ -19,6 +20,14 @@ namespace WebScraper
     {
         private ObservableCollection<EntryModel> _entries = new ObservableCollection<EntryModel>();
         private int _id = new int();
+        private int _pageAmount;
+
+        public int PageAmount
+        {
+            get { return  _pageAmount; }
+            set {  _pageAmount = value; }
+        }
+
 
         public int Id
         {
@@ -36,25 +45,33 @@ namespace WebScraper
         {
             try
             {
-                //if (!Regex.Match(page, @"/page/./").Success)
-                //    page = "https://www.skidrowreloaded.com/";
                 int pageNumber = 1;
                 Id = _entries.Count + 1;
                 var web = new HtmlWeb();
+                //_pageAmount = 0;
+
+                if (page.Contains("/page/"))
+                {
+                    pageNumber = Int32.Parse(Regex.Match(page, @"(?=.+)\d+").ToString());
+                }
+                var startPageNumber = pageNumber;
+                var finalPageNumber = startPageNumber + _pageAmount - 1;
 
                 bool loop = true;
                 while (loop)
                 {
-                    if (page.StartsWith("https://www.skidrowreloaded.com"))
+                    if (page.Contains("skidrowreloaded.com"))
                     {
-                        pageNumber++;
-                        if (page != "https://www.skidrowreloaded.com")
-                            page = $"https://www.skidrowreloaded.com/page/{pageNumber}/";
+                        if (pageNumber == finalPageNumber)
+                            loop = false;
+
+                        page = $"https://www.skidrowreloaded.com/page/{pageNumber}/";
                         var doc = web.Load(page);
 
-                        var articles = doc.DocumentNode.SelectNodes("//*[@class = 'post']");
-                        if (articles.Count == 0)
+                        if (doc.DocumentNode.SelectNodes("//*[@class = 'post']").Count == 0)
                             loop = false;
+
+                        var articles = doc.DocumentNode.SelectNodes("//*[@class = 'post']");
 
                         foreach (var article in articles)
                         {
@@ -71,28 +88,26 @@ namespace WebScraper
                             //            $"Title: {header}\n" +
                             //            $"Date: {date}\n" +
                             //            $"Link: {link}");
-
+                            
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
                             _entries.Add(new EntryModel { Id = Id, Title = header, Date = date, Link = link });
+                            });
 
                             Id = _entries.Count + 1;
                         }
-                        // DEBUG
-                        loop = false;
                         pageNumber++;
-                        System.Threading.Thread.Sleep(1000); // Delay between HTTP requests.
+                        // DEBUG
+                        //System.Threading.Thread.Sleep(300); // Delay between HTTP requests.
                     }
                 }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            catch { }
         }
 
         public void Export()
         {
-            if (Entries.Count != 0)
+            if (_entries.Count != 0)
             {
                 using (TextWriter tw = File.CreateText("SampleData.csv"))
                 {
@@ -100,7 +115,7 @@ namespace WebScraper
                     {
                         cw.WriteHeader<EntryModel>();
                         cw.NextRecord();
-                        foreach (var entry in Entries)
+                        foreach (var entry in _entries)
                         {
                             //cw.WriteHeader<EntryModel>();
                             cw.WriteRecord(entry);
@@ -120,11 +135,11 @@ namespace WebScraper
                     using (var cw = new CsvReader(tr))
                     {
                         var records = cw.GetRecords<EntryModel>();
-                        Entries.Clear();
+                        _entries.Clear();
                         //EntryModel entry = new EntryModel();
                         foreach (var entry in records)
                         {
-                            Entries.Add(entry);
+                            _entries.Add(entry);
                         }
                     }
                 }
