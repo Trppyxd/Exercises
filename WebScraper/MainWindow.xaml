@@ -63,7 +63,7 @@
 
                         <TextBox x:Name="TbPage"
                              DockPanel.Dock="Left"
-                             Text="Webpage"
+                             Text="Webpage - skidrowreloaded.com"
                              Height="30"
                              MinWidth="200"
                              Margin="0,10,0,10"
@@ -95,7 +95,8 @@
                     </DockPanel>
                     <Button Grid.Column="2" Margin="0,10,10,10"
                             x:Name="BtnStop"
-                            Content="Stop" Click="BtnStop_Click"/>
+                            Content="Stop" Click="BtnStop_Click"
+                            IsEnabled="False"/>
                 </Grid>
             </DockPanel>
         </Grid>

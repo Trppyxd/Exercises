@@ -17,6 +17,11 @@ using Microsoft.Win32;
 
 namespace WebScraper
 {
+    //
+    //
+    // ONLY WORKS WITH skidrowreloaded.com URL ATM !!!
+    //
+    //
     class Scraper
     {
         private ObservableCollection<EntryModel> _entries = new ObservableCollection<EntryModel>();
